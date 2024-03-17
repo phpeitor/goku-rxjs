@@ -7,11 +7,7 @@ Para utilizar este proyecto, sigue estos pasos:
 - Mantén presionada cualquier tecla para aumentar el poder de Goku y observa la animación de su transformación.
 
     
-
-    | First Header  | Second Header |
-    | ------------- | ------------- |
-    | Content Cell  | Content Cell  |
-    | Content Cell  | Content Cell  |
+    | First Header  | 
     open index.html
 
 RxJS es una biblioteca para programación reactiva en JavaScript que te permite trabajar con secuencias de eventos asincrónicos. La animación de poder de Goku es una demostración visual que refleja el aumento gradual del poder en forma de Super Saiyajin.
