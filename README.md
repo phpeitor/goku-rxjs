@@ -2,9 +2,9 @@
 
 Para utilizar este proyecto, sigue estos pasos:
 
-1.- Clona este repositorio en tu máquina local.
-2.- Abre el archivo index.html en tu navegador web.
-3.- Mantén presionada cualquier tecla para aumentar el poder de Goku y observa la animación de su transformación.
+- Clona este repositorio en tu máquina local.
+- Abre el archivo index.html en tu navegador web.
+- Mantén presionada cualquier tecla para aumentar el poder de Goku y observa la animación de su transformación.
 
     open index.html
     
