@@ -1,0 +1,76 @@
+body {
+  font-family: monospace;
+}
+
+#sprite {
+  background-repeat: no-repeat;
+}
+
+.base, .ssj, .ssj3 {
+  width: 120px;
+  height: 250px;
+  animation: stand .8s steps(2) infinite;
+}
+
+.base {
+  background-image: url('img/goku-standing-sheet.png');
+}
+
+.ssj {
+  background-image: url('img/goku-ssj-standing-sheet.png');
+}
+
+.ssj3 {
+  background-image: url('img/goku-ssj3-standing-sheet.png');
+}
+
+.powerup.base {
+  width: 210px;
+  height: 257px;
+  background-image: url('img/goku-powerup-sheet.png');
+  animation: powerup .3s steps(2) infinite;
+}
+
+.powerup.ssj {
+  width: 225px;
+  height: 257px;
+  background-image: url('img/goku-ssj-powerup-sheet.png');
+  animation: powerup .3s steps(2) infinite;
+}
+
+.powerup.ssj3 {
+  width: 225px;
+  height: 257px;
+  background-image: url('img/goku-ssj3-powerup-sheet.png');
+  animation: powerup .3s steps(2) infinite;
+}
+
+#meter-container {
+  position: relative;
+  border: 3px solid black;
+}
+
+#meter-container span {
+  margin-left: 10px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#meter {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: #FFFD38;
+  z-index: -1;
+}
+
+@keyframes stand {
+  from { background-position: 0px; }
+  to { background-position: -255px; }
+}
+
+@keyframes powerup {
+  from { background-position: 0px; }
+  to { background-position: -513px; }
+}
