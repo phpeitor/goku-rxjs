@@ -1,9 +1,9 @@
-# Goku rxJS 🐉💥
+# Goku RxJs 🐉💥
 
 [![forthebadge](http://forthebadge.com/images/badges/made-with-javascript.svg)](https://www.linkedin.com/in/drphp/)
 [![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](https://www.linkedin.com/in/drphp/)
 
-RxJS es una biblioteca para programación reactiva en JavaScript que te permite trabajar con secuencias de eventos asincrónicos.
+RxJs es una biblioteca para programación reactiva en JavaScript que te permite trabajar con secuencias de eventos asincrónicos.
 Para utilizar este proyecto sigue estos pasos:
 
 ## 🚀 Quick Start
