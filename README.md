@@ -1,4 +1,4 @@
-# Goku RxJS 🐉💥💪🏻
+# Goku RxJS 🐉💥
 
 Para utilizar este proyecto, sigue estos pasos:
 
