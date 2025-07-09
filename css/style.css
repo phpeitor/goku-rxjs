@@ -1,0 +1,155 @@
+body {
+  font-family: monospace;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#root {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+  box-sizing: border-box;
+}
+
+#sprite {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated; 
+  filter: drop-shadow(0 0 20px rgba(255, 255, 0, 0.7));
+  transition: all 0.3s ease;
+}
+
+.base, .ssj, .ssj3 {
+  width: 120px;
+  height: 250px;
+  animation: 
+    stand .8s steps(2) infinite,
+    float 3s ease-in-out infinite;
+
+}
+
+.base {
+  background-image: url('../img/goku-standing-sheet.png');
+  filter: drop-shadow(0 0 5px rgba(255, 165, 0, 0.5));
+}
+
+.ssj {
+  background-image: url('../img/goku-ssj-standing-sheet.png');
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7)); 
+}
+
+.ssj3 {
+  background-image: url('../img/goku-blue-standing-sheet.png');
+  filter: drop-shadow(0 0 15px rgba(0, 191, 255, 0.8));
+}
+
+.power-btn {
+  padding: 5px 15px;
+  margin: 5px;
+  font-size: 1.2em;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+  transition: all 0.3s;
+}
+
+.power-btn:hover {
+  transform: scale(1.1);
+}
+
+.increase {
+  background-color: #4CAF50;
+}
+
+.decrease {
+  background-color: #f44336;
+}
+
+.powerup {
+  width: 210px;
+  height: 257px;
+  animation: powerup .3s steps(2) infinite;
+  filter: 
+    drop-shadow(0 0 20px rgba(255, 255, 0, 0.9))
+    brightness(1.2);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.powerup.base {
+  width: 225px;
+  height: 257px;
+  background-image: url('../img/goku-powerup-sheet.png');
+}
+
+.powerup.ssj {
+  width: 225px;
+  height: 257px;
+  background-image: url('../img/goku-ssj-powerup-sheet.png');
+}
+
+.powerup.ssj3 {
+  width: 225px;
+  height: 257px;
+  background-image: url('../img/goku-blue-powerup-sheet.png');
+}
+
+.power-controls {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+#meter-container {
+  position: relative;
+  border: 3px solid rgba(255, 255, 255, 0.3); 
+  padding-bottom: 20px;
+  background-color: rgba(0, 0, 0, 0.4);  
+  border-radius: 5px;
+  backdrop-filter: blur(2px);  
+  margin: 20px;
+}
+
+#meter-container span {
+  margin-left: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;  
+  text-shadow: 1px 1px 2px black; 
+}
+
+#meter {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: #FFFD38;
+  z-index: -1;
+  transition: width 0.3s, background-color 0.3s;
+  border-radius: 0 3px 3px 0;  
+  border-right: 2px solid white;
+}
+
+@keyframes stand {
+  from { background-position: 0px; }
+  to { background-position: -255px; }
+}
+
+@keyframes powerup {
+  from { background-position: 0px; }
+  to { background-position: -513px; }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
