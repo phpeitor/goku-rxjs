@@ -11,8 +11,8 @@ const CONFIG = {
   DECAY_STEP: 1,      // decremento por tick en decay
   DECAY_MS: 500,      // cada cuánto decae
   KEY_STEP_MS: 100,   // throttling de teclas
-  HOLD_MS: 100,       // intervalo de repetición cuando dejas presionado botón
-  LOG_BATCH: 10       // cada cuántos eventos imprimir tabla
+  HOLD_MS: 100,       // repetición cuando mantienes presionado botón
+  LOG_BATCH: 10       // cada cuántos eventos imprimir tablas
 };
 
 // ====== Medidor ======
@@ -53,14 +53,13 @@ const main = () => {
   // Botón Pausa
   const pauseBtn = $('#pause-btn');
   const paused$ = new BehaviorSubject(false);
-  fromEvent(pauseBtn, 'click').pipe(
-    withLatestFrom(paused$),
-    map(([, p]) => !p)
-  ).subscribe((newPaused) => {
-    paused$.next(newPaused);
-    pauseBtn.classList.toggle('active', newPaused);
-    pauseBtn.textContent = newPaused ? '▶️ Reanudar' : '⏸️ Pausar';
-  });
+  fromEvent(pauseBtn, 'click')
+    .pipe(withLatestFrom(paused$), map(([, p]) => !p))
+    .subscribe((newPaused) => {
+      paused$.next(newPaused);
+      pauseBtn.classList.toggle('active', newPaused);
+      pauseBtn.textContent = newPaused ? '▶️ Reanudar' : '⏸️ Pausar';
+    });
 
   // ====== Streams de entrada ======
   const keyDown$ = fromEvent(document, 'keydown').pipe(
@@ -75,7 +74,7 @@ const main = () => {
   const upKey$    = keyDown$.pipe(filter(e => e.key === 'ArrowUp'));
   const downKey$  = keyDown$.pipe(filter(e => e.key === 'ArrowDown'));
 
-  // Throttle a teclas para no spamear incrementos
+  // Throttle a teclas
   const throttleCfg = { leading: true, trailing: false };
   const incKeys$ = merge(rightKey$, upKey$).pipe(
     throttleTime(CONFIG.KEY_STEP_MS, undefined, throttleCfg),
@@ -86,16 +85,16 @@ const main = () => {
     map(() => ({ change: -CONFIG.STEP, source: 'key' }))
   );
 
-  // Click puntual en botones
+  // Click puntual
   const incClick$ = fromEvent(increaseBtn, 'click').pipe(map(() => ({ change: +CONFIG.STEP, source: 'click' })));
   const decClick$ = fromEvent(decreaseBtn, 'click').pipe(map(() => ({ change: -CONFIG.STEP, source: 'click' })));
 
-  // Hold en botones (pointerdown -> interval hasta pointerup/leave)
+  // Hold en botones
   const holdStream = (el, delta) =>
     fromEvent(el, 'pointerdown').pipe(
       switchMap(() =>
         interval(CONFIG.HOLD_MS).pipe(
-          startWith(0), // emite inmediatamente
+          startWith(0),
           map(() => ({ change: delta, source: 'hold' })),
           takeUntil(merge(
             fromEvent(el, 'pointerup'),
@@ -109,7 +108,7 @@ const main = () => {
   const incHold$ = holdStream(increaseBtn, +CONFIG.STEP);
   const decHold$ = holdStream(decreaseBtn, -CONFIG.STEP);
 
-  // Decay: al soltar cualquier flecha, empieza a decaer hasta que vuelvas a presionar
+  // Decay
   const powerDecay$ = keyUp$.pipe(
     switchMap(() =>
       interval(CONFIG.DECAY_MS).pipe(
@@ -119,17 +118,16 @@ const main = () => {
     )
   );
 
-  // Mezcla total de cambios (teclas, clicks, hold, decay)
+  // Mezcla total
   const powerChanges$ = merge(
     incKeys$, decKeys$, incClick$, decClick$, incHold$, decHold$, powerDecay$
   ).pipe(
-    // Respeta el estado de pausa
     withLatestFrom(paused$),
     filter(([, paused]) => !paused),
     map(([evt]) => evt)
   );
 
-  // ====== Estado de poder (único stream de estado) ======
+  // Estado del nivel
   const level$ = powerChanges$.pipe(
     scan((acc, { change }) => {
       const next = acc + change;
@@ -138,10 +136,10 @@ const main = () => {
     distinctUntilChanged()
   );
 
-  // ====== Lógica de UI y logging (single subscribe) ======
-  // Guardaremos logs y mostraremos console.table en batch y en powerups
+  // ====== Lógica de UI + logging ======
   const logs = [];
   const powerUpLogs = [];
+  const powerDownLogs = [];
 
   level$.pipe(
     pairwise(), // [prev, curr]
@@ -162,12 +160,15 @@ const main = () => {
       }
     }),
     map(([prev, curr]) => {
-      const increasing = curr > prev;
-      // Flag visual de "powerup" cuando sube
+      const delta = curr - prev;
+      const increasing = delta > 0;
+      const decreasing = delta < 0;
+
+      // Efecto visual "powerup" solo cuando sube
       if (increasing) sprite.classList.add('powerup');
       else sprite.classList.remove('powerup');
 
-      // Determinar transformación
+      // Estado visual
       const state = (curr >= 100) ? 'ssj3' : (curr >= 50) ? 'ssj' : 'base';
 
       // ====== Logging ======
@@ -175,33 +176,40 @@ const main = () => {
         ts: new Date().toLocaleTimeString(),
         prevLevel: prev,
         currentLevel: curr,
-        delta: curr - prev,
+        delta,
         state,
-        powerup: increasing ? '✅' : ''
+        trend: increasing ? 'UP' : decreasing ? 'DOWN' : 'FLAT'
       };
+
       logs.push(row);
       if (increasing) powerUpLogs.push(row);
+      if (decreasing) powerDownLogs.push(row);
 
-      // mostrar tabla cada LOG_BATCH
+      // Mostrar tablas cada LOG_BATCH eventos
       if (logs.length % CONFIG.LOG_BATCH === 0) {
         console.clear();
-        console.log('📊 Últimos cambios de poder (batch):');
+        console.log('📊 Últimos cambios (batch):');
         console.table(logs.slice(-CONFIG.LOG_BATCH));
+
         if (powerUpLogs.length) {
           console.log('⚡ PowerUps detectados:');
           console.table(powerUpLogs.slice(-CONFIG.LOG_BATCH));
+        }
+        if (powerDownLogs.length) {
+          console.log('🧯 PowerDowns detectados:');
+          console.table(powerDownLogs.slice(-CONFIG.LOG_BATCH));
         }
       }
 
       return state;
     }),
-    distinctUntilChanged() // solo cuando cambia base/ssj/ssj3
+    distinctUntilChanged() // base/ssj/ssj3
   ).subscribe((state) => {
     sprite.classList.remove('base', 'ssj', 'ssj3');
     sprite.classList.add(state);
   });
 
-  // Quitar clase powerup cuando se deja de interactuar (mouse/teclas)
+  // Quitar clase powerup al soltar interacción
   merge(
     fromEvent(document, 'keyup'),
     fromEvent(increaseBtn, 'pointerup'),
@@ -212,7 +220,7 @@ const main = () => {
     sprite.classList.remove('powerup');
   });
 
-  // Inicializar UI
+  // Inicial
   fillMeter(0);
 };
 
