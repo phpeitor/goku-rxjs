@@ -1,28 +1,43 @@
-// ====== Utilidades DOM ======
 const $ = document.querySelector.bind(document);
 const sprite = $('#sprite');
 const meterContainer = $('#meter-container');
 const meter = $('#meter');
+const brand = document.querySelector('.brand');   
+const logo  = document.getElementById('logo');    
 
-// ====== Configuración central ======
-const CONFIG = {
-  MAX_LEVEL: 150,
-  STEP: 1,            // incremento base por tick
-  DECAY_STEP: 1,      // decremento por tick en decay
-  DECAY_MS: 500,      // cada cuánto decae
-  KEY_STEP_MS: 100,   // throttling de teclas
-  HOLD_MS: 100,       // repetición cuando mantienes presionado botón
-  LOG_BATCH: 10       // cada cuántos eventos imprimir tablas
+const LOGOS_BY_STATE = {
+  base: './img/logo01.png',
+  ssj:  './img/logo02.png',
+  ssj3: './img/logo03.png'
 };
 
-// ====== Medidor ======
+Object.values(LOGOS_BY_STATE).forEach(src => { const im = new Image(); im.src = src; });
+
+let currentLogoState = null;
+function setLogoForState(state) {
+  if (!logo) return;
+  if (state !== currentLogoState && LOGOS_BY_STATE[state]) {
+    logo.src = LOGOS_BY_STATE[state];
+    currentLogoState = state;
+  }
+}
+
+const CONFIG = {
+  MAX_LEVEL: 150,
+  STEP: 1,         
+  DECAY_STEP: 1,      
+  DECAY_MS: 500,   
+  KEY_STEP_MS: 100,  
+  HOLD_MS: 100,      
+  LOG_BATCH: 10    
+};
+
 const fillMeter = (level) => {
   const containerWidth = meterContainer.offsetWidth;
   const newWidth = (level / CONFIG.MAX_LEVEL) * containerWidth;
   meter.style.width = `${newWidth}px`;
 };
 
-// ====== App Principal ======
 const main = () => {
   const { fromEvent, interval, merge, BehaviorSubject } = rxjs;
   const {
@@ -31,10 +46,8 @@ const main = () => {
     withLatestFrom, startWith
   } = rxjs.operators;
 
-  // UI dinámica
   let labelContador = document.getElementById('contador');
 
-  // Controles +/-
   const controls = document.createElement('div');
   controls.className = 'power-controls';
 
@@ -50,7 +63,6 @@ const main = () => {
   controls.appendChild(increaseBtn);
   meterContainer.appendChild(controls);
 
-  // Botón Pausa
   const pauseBtn = $('#pause-btn');
   const paused$ = new BehaviorSubject(false);
   fromEvent(pauseBtn, 'click')
@@ -61,7 +73,6 @@ const main = () => {
       pauseBtn.textContent = newPaused ? '▶️ Reanudar' : '⏸️ Pausar';
     });
 
-  // ====== Streams de entrada ======
   const keyDown$ = fromEvent(document, 'keydown').pipe(
     filter(e => ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key))
   );
@@ -73,8 +84,6 @@ const main = () => {
   const leftKey$  = keyDown$.pipe(filter(e => e.key === 'ArrowLeft'));
   const upKey$    = keyDown$.pipe(filter(e => e.key === 'ArrowUp'));
   const downKey$  = keyDown$.pipe(filter(e => e.key === 'ArrowDown'));
-
-  // Throttle a teclas
   const throttleCfg = { leading: true, trailing: false };
   const incKeys$ = merge(rightKey$, upKey$).pipe(
     throttleTime(CONFIG.KEY_STEP_MS, undefined, throttleCfg),
@@ -85,11 +94,9 @@ const main = () => {
     map(() => ({ change: -CONFIG.STEP, source: 'key' }))
   );
 
-  // Click puntual
   const incClick$ = fromEvent(increaseBtn, 'click').pipe(map(() => ({ change: +CONFIG.STEP, source: 'click' })));
   const decClick$ = fromEvent(decreaseBtn, 'click').pipe(map(() => ({ change: -CONFIG.STEP, source: 'click' })));
 
-  // Hold en botones
   const holdStream = (el, delta) =>
     fromEvent(el, 'pointerdown').pipe(
       switchMap(() =>
@@ -108,7 +115,6 @@ const main = () => {
   const incHold$ = holdStream(increaseBtn, +CONFIG.STEP);
   const decHold$ = holdStream(decreaseBtn, -CONFIG.STEP);
 
-  // Decay
   const powerDecay$ = keyUp$.pipe(
     switchMap(() =>
       interval(CONFIG.DECAY_MS).pipe(
@@ -118,7 +124,6 @@ const main = () => {
     )
   );
 
-  // Mezcla total
   const powerChanges$ = merge(
     incKeys$, decKeys$, incClick$, decClick$, incHold$, decHold$, powerDecay$
   ).pipe(
@@ -127,7 +132,6 @@ const main = () => {
     map(([evt]) => evt)
   );
 
-  // Estado del nivel
   const level$ = powerChanges$.pipe(
     scan((acc, { change }) => {
       const next = acc + change;
@@ -136,15 +140,13 @@ const main = () => {
     distinctUntilChanged()
   );
 
-  // ====== Lógica de UI + logging ======
   const logs = [];
   const powerUpLogs = [];
   const powerDownLogs = [];
 
   level$.pipe(
-    pairwise(), // [prev, curr]
+    pairwise(),
     tap(([prev, curr]) => {
-      // UI: contador + barra + colores
       labelContador.textContent = '💪 ' + curr;
       fillMeter(curr);
 
@@ -164,14 +166,11 @@ const main = () => {
       const increasing = delta > 0;
       const decreasing = delta < 0;
 
-      // Efecto visual "powerup" solo cuando sube
       if (increasing) sprite.classList.add('powerup');
       else sprite.classList.remove('powerup');
 
-      // Estado visual
       const state = (curr >= 100) ? 'ssj3' : (curr >= 50) ? 'ssj' : 'base';
 
-      // ====== Logging ======
       const row = {
         ts: new Date().toLocaleTimeString(),
         prevLevel: prev,
@@ -185,7 +184,6 @@ const main = () => {
       if (increasing) powerUpLogs.push(row);
       if (decreasing) powerDownLogs.push(row);
 
-      // Mostrar tablas cada LOG_BATCH eventos
       if (logs.length % CONFIG.LOG_BATCH === 0) {
         console.clear();
         console.log('📊 Últimos cambios (batch):');
@@ -203,13 +201,13 @@ const main = () => {
 
       return state;
     }),
-    distinctUntilChanged() // base/ssj/ssj3
+    distinctUntilChanged()
   ).subscribe((state) => {
     sprite.classList.remove('base', 'ssj', 'ssj3');
     sprite.classList.add(state);
+    setLogoForState(state)
   });
 
-  // Quitar clase powerup al soltar interacción
   merge(
     fromEvent(document, 'keyup'),
     fromEvent(increaseBtn, 'pointerup'),
@@ -220,7 +218,6 @@ const main = () => {
     sprite.classList.remove('powerup');
   });
 
-  // Inicial
   fillMeter(0);
 };
 
