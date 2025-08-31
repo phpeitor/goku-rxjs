@@ -216,184 +216,88 @@ body {
 }
 
 .power-btn.pause {
-  position: absolute;
-  top: 8px;
-  right: 8px;
   padding: 4px 10px;
   font-size: 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: #008CBA;
-  z-index: 2;
 }
 
 .power-btn.pause.active {
   background-color: #555;
 }
 
-/*Animation elephant*/
-.button-container {
-  position: fixed;
-  bottom: 50px; 
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000; 
-  width: 100%;
-  text-align: center;
+/* --- Contenedor acciones (btn + logo) arriba a la derecha --- */
+.hud-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 3;
 }
 
-:root {
-  --color: var(--yellow-5);
-  --shadow: var(--yellow-8);
-  --glare: hsla(56, 98%, 52%, 0.638);
-  --font-size: var(--font-size-fluid-3);
-  --transition: 0.2s;
-}
-
-a {
-  --padding: var(--size-2);
-  padding: var(--padding);
-  border-radius: var(--size-4);
-  text-decoration: none;
-  color: transparent;
-  position: relative;
-  transition: background 0.2s;
-}
-
-a:hover {
-  background: var(--gray-8);
-}
-
-span {
+/* El contenedor ya lo tenías, solo asegúrate de esto: */
+.brand {
+  position: relative;           /* NECESARIO para posicionar .sparks */
   display: inline-block;
-  font-size: calc(var(--font-size) * 1.5);
-  font-weight: var(--font-weight-9);
-  transition: all 0.2s;
-  text-decoration: none;
-  text-shadow:
-    calc(var(--hover) * (var(--font-size) * -0)) calc(var(--hover) * (var(--font-size) * 0)) var(--shadow),
-    calc(var(--hover) * (var(--font-size) * -0.02)) calc(var(--hover) * (var(--font-size) * 0.02)) var(--shadow),
-    calc(var(--hover) * (var(--font-size) * -0.04)) calc(var(--hover) * (var(--font-size) * 0.04)) var(--shadow),
-    calc(var(--hover) * (var(--font-size) * -0.06)) calc(var(--hover) * (var(--font-size) * 0.06)) var(--shadow),
-    calc(var(--hover) * (var(--font-size) * -0.08)) calc(var(--hover) * (var(--font-size) * 0.08)) var(--shadow),
-    calc(var(--hover) * (var(--font-size) * -0.10)) calc(var(--hover) * (var(--font-size) * 0.10)) var(--shadow);
-  transform: translate(calc(var(--hover) * (var(--font-size) * 0.10)), calc(var(--hover) * (var(--font-size) * -0.10)));
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+  transition: transform .2s, box-shadow .2s;
 }
 
-span:last-of-type {
+#logo {
+  display: block;
+  width: 120px;
+  height: auto;
+  border-radius: 10px;
+  position: relative;
+  z-index: 1;                   /* El logo debajo de los destellos */
+}
+
+/* SVG overlay de destellos */
+.sparks {
   position: absolute;
-  inset: var(--padding);
-  background: linear-gradient(
-    108deg,
-    transparent 0 55%,
-    var(--glare) 55% 60%,
-    transparent 60% 70%,
-    var(--glare) 70% 85%,
-    transparent 85%
-  ) calc(var(--pos) * -200%) 0% / 200% 100%, var(--color);
-  -webkit-background-clip: text;
-  color: transparent;
-  z-index: 2;
-  text-shadow: none;
-  transform: translate(calc(var(--hover) * (var(--font-size) * 0.10)), calc(var(--hover) * (var(--font-size) * -0.10)));
-}
-
-span:last-of-type {
-  transition: transform 0.2s, background-position 0s;
-}
-
-a:hover span:last-of-type {
-  transition: transform 0.2s, background-position calc(var(--hover) * 1.5s) calc(var(--hover) * 0.25s);
-}
-
-a {
-  --hover: 0.4;
-  --pos: 0;
-}
-
-a:hover {
-  --hover: 1;
-  --pos: 1;
-}
-
-a:active {
-  --hover: 0;
-}
-
-a:active span:last-of-type {
-  --hover: 0;
-  --pos: 1;
-}
-
-a svg {
-	position: absolute;
-	z-index: 3;
-	width: calc(var(--font-size) * 0.5);
-	aspect-ratio: 1;
-}
-
-a svg path {
-	fill: var(--glare);
-}
-
-/* Animation sparkles */
-a:hover svg {
-	animation: sparkle 0.75s calc((var(--delay-step) * var(--d)) * 1s) both;
-}
-
-@keyframes sparkle {
-	50% {
-		transform: translate(-50%, -50%) scale(var(--s, 1));
-	}
-}
-
-a svg {
-	--delay-step: 0.15;
-	top: calc(var(--y, 50) * 1%);
-	left:  calc(var(--x, 0) * 1%);
-	transform: translate(-50%, -50%) scale(0);
-}
-
-a svg:nth-of-type(2) {
-	--x: 0;
-	--y: 20;
-	--s: 1.1;
-	--d: 1;
-}
-
-a svg:nth-of-type(3) {
-	--x: 55;
-	--y: 80;
-	--s: 1.25;
-	--d: 2;
-}
-
-.spark {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  color: gold; 
-  opacity: 0;
+  inset: -16px;                 /* cubre alrededor del logo */
   pointer-events: none;
-  animation: spark 2s infinite;
+  overflow: visible;
+  z-index: 2;                   /* Encima del logo */
 }
 
-@keyframes spark {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1) rotate(180deg);
-  }
+/* ¡OJO! No uses fill totalmente transparente */
+.burst {
+  fill: #FFD21F;                /* visible */
+  opacity: 0;                   /* aparece con la animación */
+  filter:
+    drop-shadow(0 0 6px rgba(255,200,0,.9))
+    drop-shadow(0 0 14px rgba(255,160,0,.6));
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
 }
 
-.spark:nth-child(1) {
-  left: 10%;
-  top: 20%;
-  animation-delay: 0s;
+/* Variantes de posición/tamaño */
+.b1 { transform: translate(15%, 20%) scale(0.35) rotate(0deg);   }
+.b2 { transform: translate(65%, 75%) scale(0.45) rotate(15deg);  }
+.b3 { transform: translate(85%, 10%) scale(0.40) rotate(-12deg); }
+
+/* Disparo en hover (escalonado) */
+.brand:hover .b1 { animation: burst-pop 900ms ease-out 0ms   both; }
+.brand:hover .b2 { animation: burst-pop 900ms ease-out 120ms both; }
+.brand:hover .b3 { animation: burst-pop 900ms ease-out 240ms both; }
+
+@keyframes burst-pop {
+  0%   { opacity: 0; transform: scale(.2) rotate(0deg); }
+  20%  { opacity: 1; transform: scale(1.00) rotate(90deg); }
+  60%  { opacity: .9; transform: scale(.85) rotate(180deg); }
+  100% { opacity: 0; transform: scale(.2) rotate(230deg); }
 }
 
-#logo{
-  width: 100px;
+/* Respeta reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .brand:hover .burst { animation: none; opacity: .75; }
 }
