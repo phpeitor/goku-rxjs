@@ -214,3 +214,12 @@ body {
     content: "";
     animation: blink 1s infinite steps(1);
 }
+
+.power-btn.pause {
+  background-color: #008CBA;
+  margin-left: 10px;
+}
+
+.power-btn.pause.active {
+  background-color: #555;
+}
