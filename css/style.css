@@ -39,7 +39,6 @@ body {
   animation: 
     stand .8s steps(2) infinite,
     float 3s ease-in-out infinite;
-
 }
 
 .base {
