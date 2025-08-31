@@ -240,10 +240,12 @@ body {
 .brand { position: relative; display:inline-block; padding:6px;
   border-radius: 12px; background: rgba(0,0,0,.35);
   border:1px solid rgba(255,255,255,.25); backdrop-filter: blur(2px);
+  --spark-k: .35;
 }
 #logo { width:120px; height:auto; border-radius:10px; display:block; position:relative; z-index:1; }
 
-.sparks { position:absolute; inset:-16px; overflow:visible; pointer-events:none; z-index:2; }
+.sparks { position:absolute; inset:-16px; overflow:visible; pointer-events:none; z-index:2; inset: calc(-5px * var(--spark-k));      /* borde de cobertura acorde al tamaño */
+  transform: scale(var(--spark-k)); transform-origin: 100% 0%; }
 
 .brand .burst{
   fill:#FFD21F;
