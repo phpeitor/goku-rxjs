@@ -275,3 +275,12 @@ body {
 @media (prefers-reduced-motion: reduce){
   .brand:hover .burst{ animation: none; opacity:.75; }
 }
+
+.brand.pulse {
+  animation: brand-pop .35s ease;
+}
+@keyframes brand-pop {
+  0% { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(255,215,0,0)); }
+  50%{ transform: scale(1.06); filter: drop-shadow(0 0 8px rgba(255,215,0,.6)); }
+  100%{transform: scale(1);    filter: drop-shadow(0 0 0 rgba(255,215,0,0)); }
+}

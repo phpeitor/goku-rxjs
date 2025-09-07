@@ -171,6 +171,14 @@ const main = () => {
 
       const state = (curr >= 100) ? 'ssj3' : (curr >= 50) ? 'ssj' : 'base';
 
+      const prevState = (prev >= 100) ? 'ssj3' : (prev >= 50) ? 'ssj' : 'base';
+      if (increasing && state !== prevState && brand) {
+        brand.classList.remove('pulse');  
+        void brand.offsetWidth;            
+        brand.classList.add('pulse');
+        setTimeout(() => brand.classList.remove('pulse'), 350);
+      }
+
       const row = {
         ts: new Date().toLocaleTimeString(),
         prevLevel: prev,
