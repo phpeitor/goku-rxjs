@@ -17,8 +17,35 @@ body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+  /* fondo principal: ahora gestionado por la pseudo-capa movible */
+  background: none;
+  --bg-x: 0px;
+  --bg-y: 0px;
+  --bg-opacity: 0.65;
   box-sizing: border-box;
+}
+
+/* Capa de fondo movible y difusa (sutil) */
+#root::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 30%, #2c5364 50%, #b21f1f 75%, #fdbb2d 100%);
+  background-size: 200% 200%;
+  transform: translate3d(var(--bg-x), var(--bg-y), 0) scale(1.06);
+  filter: blur(28px) saturate(1.05);
+  opacity: var(--bg-opacity);
+  transition: opacity 400ms linear;
+  will-change: transform, opacity;
+}
+
+/* Asegurar que el contenido esté por encima de la capa de fondo */
+#root > * { position: relative; z-index: 1; }
+
+@media (prefers-reduced-motion: reduce){
+  #root::before{ transition: none; transform: none; filter: none; }
 }
 
 #sprite {

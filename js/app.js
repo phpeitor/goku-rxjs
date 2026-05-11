@@ -230,3 +230,37 @@ const main = () => {
 };
 
 main();
+
+/* Fondo gradiente sutil movible: parallax ligero según puntero */
+(function(){
+  const root = document.getElementById('root');
+  if (!root) return;
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+
+  let targetX = 0, targetY = 0;
+  let curX = 0, curY = 0;
+  const maxMove = 18; // px máximo de desplazamiento
+  const ease = 0.09; // suavizado
+
+  const onPointer = (e) => {
+    const x = e.clientX ?? (e.touches && e.touches[0] && e.touches[0].clientX) ?? window.innerWidth / 2;
+    const y = e.clientY ?? (e.touches && e.touches[0] && e.touches[0].clientY) ?? window.innerHeight / 2;
+    const nx = (x - window.innerWidth / 2) / (window.innerWidth / 2);
+    const ny = (y - window.innerHeight / 2) / (window.innerHeight / 2);
+    targetX = Math.max(-maxMove, Math.min(maxMove, -nx * maxMove));
+    targetY = Math.max(-maxMove, Math.min(maxMove, -ny * maxMove));
+  };
+
+  window.addEventListener('pointermove', onPointer, { passive: true });
+  window.addEventListener('pointerleave', () => { targetX = 0; targetY = 0; }, { passive: true });
+
+  function frame(){
+    curX += (targetX - curX) * ease;
+    curY += (targetY - curY) * ease;
+    root.style.setProperty('--bg-x', curX.toFixed(2) + 'px');
+    root.style.setProperty('--bg-y', curY.toFixed(2) + 'px');
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();

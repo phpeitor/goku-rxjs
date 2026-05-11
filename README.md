@@ -1,4 +1,4 @@
-# Goku RxJs 🐉💥
+# Goku RxJs 🐉
 
 [![forthebadge](http://forthebadge.com/images/badges/made-with-javascript.svg)](https://www.linkedin.com/in/drphp/)
 [![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](https://www.linkedin.com/in/drphp/)
@@ -18,8 +18,5 @@ cd goku-rxjs
 index.html
 ```
 
-[![Video](https://img.youtube.com/vi/cqWT28OOpqA/0.jpg)](https://www.youtube.com/watch?v=cqWT28OOpqA)  
-[Ver demo?v1](https://www.youtube.com/watch?v=cqWT28OOpqA)
-
 [![Video](https://img.youtube.com/vi/e03SYkcAgR4/0.jpg)](https://www.youtube.com/watch?v=e03SYkcAgR4)  
-[Ver demo?v2](https://www.youtube.com/watch?v=e03SYkcAgR4)
+[Ver demo](https://www.youtube.com/watch?v=e03SYkcAgR4)
