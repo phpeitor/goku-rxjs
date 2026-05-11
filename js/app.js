@@ -227,6 +227,20 @@ const main = () => {
   });
 
   fillMeter(0);
+
+  // Ajustar propiedades del fondo en función del nivel (RxJS)
+  const rootEl = document.getElementById('root');
+  if (rootEl) {
+    level$.subscribe(level => {
+      const frac = level / CONFIG.MAX_LEVEL;
+      const opacity = (0.6 + frac * 0.35).toFixed(2); // 0.6 -> 0.95
+      const blurPx = (20 - frac * 12).toFixed(1) + 'px'; // 20px -> 8px
+      const sat = (1 + frac * 0.35).toFixed(2); // 1 -> 1.35
+      rootEl.style.setProperty('--bg-opacity', opacity);
+      rootEl.style.setProperty('--bg-blur', blurPx);
+      rootEl.style.setProperty('--bg-sat', sat);
+    });
+  }
 };
 
 main();
@@ -234,33 +248,65 @@ main();
 /* Fondo gradiente sutil movible: parallax ligero según puntero */
 (function(){
   const root = document.getElementById('root');
+  const pauseBtn = document.getElementById('pause-btn');
   if (!root) return;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReduced) return;
 
-  let targetX = 0, targetY = 0;
-  let curX = 0, curY = 0;
-  const maxMove = 18; // px máximo de desplazamiento
-  const ease = 0.09; // suavizado
+  const { fromEvent, animationFrames, interval, BehaviorSubject } = rxjs;
+  const { map, startWith, withLatestFrom, filter } = rxjs.operators;
 
-  const onPointer = (e) => {
-    const x = e.clientX ?? (e.touches && e.touches[0] && e.touches[0].clientX) ?? window.innerWidth / 2;
-    const y = e.clientY ?? (e.touches && e.touches[0] && e.touches[0].clientY) ?? window.innerHeight / 2;
-    const nx = (x - window.innerWidth / 2) / (window.innerWidth / 2);
-    const ny = (y - window.innerHeight / 2) / (window.innerHeight / 2);
-    targetX = Math.max(-maxMove, Math.min(maxMove, -nx * maxMove));
-    targetY = Math.max(-maxMove, Math.min(maxMove, -ny * maxMove));
-  };
-
-  window.addEventListener('pointermove', onPointer, { passive: true });
-  window.addEventListener('pointerleave', () => { targetX = 0; targetY = 0; }, { passive: true });
-
-  function frame(){
-    curX += (targetX - curX) * ease;
-    curY += (targetY - curY) * ease;
-    root.style.setProperty('--bg-x', curX.toFixed(2) + 'px');
-    root.style.setProperty('--bg-y', curY.toFixed(2) + 'px');
-    requestAnimationFrame(frame);
+  // paused stream based on pause button state (keeps parity with UI)
+  const paused$ = new BehaviorSubject(pauseBtn && pauseBtn.classList.contains('active'));
+  if (pauseBtn) {
+    fromEvent(pauseBtn, 'click').pipe(
+      map(() => pauseBtn.classList.contains('active')),
+      startWith(pauseBtn.classList.contains('active'))
+    ).subscribe(paused$);
   }
-  requestAnimationFrame(frame);
+
+  // pointer position stream (center by default)
+  const pointer$ = fromEvent(window, 'pointermove').pipe(
+    map(e => ({ x: e.clientX, y: e.clientY })),
+    startWith({ x: window.innerWidth/2, y: window.innerHeight/2 })
+  );
+
+  // small random drift every few seconds for breathing effect
+  const drift$ = interval(3200).pipe(
+    startWith(0),
+    map(() => ({ dx: (Math.random()*2-1)*8, dy: (Math.random()*2-1)*6 }))
+  );
+
+  // target position combines pointer + drift
+  const target$ = pointer$.pipe(
+    withLatestFrom(drift$),
+    map(([p, d]) => {
+      const nx = (p.x - window.innerWidth/2) / (window.innerWidth/2);
+      const ny = (p.y - window.innerHeight/2) / (window.innerHeight/2);
+      const max = 14;
+      return { tx: -nx * max + d.dx, ty: -ny * max + d.dy };
+    })
+  );
+
+  // animate smoothly using animationFrames
+  let cur = { x: 0, y: 0 };
+  const ease = 0.08;
+  animationFrames().pipe(
+    withLatestFrom(target$, paused$),
+    filter(([, , p]) => !p),
+    map(([, t]) => t)
+  ).subscribe(target => {
+    cur.x += (target.tx - cur.x) * ease;
+    cur.y += (target.ty - cur.y) * ease;
+    root.style.setProperty('--bg-x', cur.x.toFixed(2) + 'px');
+    root.style.setProperty('--bg-y', cur.y.toFixed(2) + 'px');
+  });
+
+  // subtle periodic background-position shift for color movement
+  animationFrames().pipe(
+    filter(() => !prefersReduced)
+  ).subscribe(f => {
+    const pct = 50 + Math.sin(f.elapsed / 4200) * 6; // small oscillation
+    root.style.setProperty('--bg-pos', pct.toFixed(2) + '%');
+  });
 })();

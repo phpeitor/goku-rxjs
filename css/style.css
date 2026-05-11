@@ -33,11 +33,13 @@ body {
   z-index: 0;
   pointer-events: none;
   background: linear-gradient(135deg, #0f2027 0%, #203a43 30%, #2c5364 50%, #b21f1f 75%, #fdbb2d 100%);
-  background-size: 200% 200%;
-  transform: translate3d(var(--bg-x), var(--bg-y), 0) scale(1.06);
-  filter: blur(28px) saturate(1.05);
-  opacity: var(--bg-opacity);
-  transition: opacity 400ms linear;
+  background-size: 150% 150%;
+  background-position: var(--bg-pos, 50%) center;
+  transform: translate3d(var(--bg-x), var(--bg-y), 0) scale(1.02);
+  /* controlar blur/saturación/opacity desde JS mediante variables CSS */
+  filter: blur(var(--bg-blur, 12px)) saturate(var(--bg-sat, 1.05));
+  opacity: var(--bg-opacity, 0.65);
+  transition: opacity 300ms linear, transform 300ms linear;
   will-change: transform, opacity;
 }
 
