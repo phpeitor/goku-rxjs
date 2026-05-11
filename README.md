@@ -4,7 +4,7 @@
 [![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](https://www.linkedin.com/in/drphp/)
 
 [![Video](https://img.youtube.com/vi/e03SYkcAgR4/0.jpg)](https://www.youtube.com/watch?v=e03SYkcAgR4)  
-[Ver demo](https://www.youtube.com/watch?v=e03SYkcAgR4)
+[![Video Demo](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=e03SYkcAgR4)
 
 ## Características
 - UI retro con sprites y animaciones por frames.
